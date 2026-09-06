@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Puja Samagri | Divine Purity & Sacred Essentials</title>
+
+    <!-- Google Fonts for Spiritual Theme -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Open Graph / Social Sharing Meta Tags -->
+    <meta property="og:title" content="Puja Samagri — Sacred Living & Divine Purity" />
+    <meta property="og:description" content="Discover 100% pure, Vedic certified spiritual products, brass idols, natural dhoop, and divine puja essentials." />
+    <meta property="og:image" content="/Febiconlogo.webp" />
+    <meta property="og:type" content="website" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/Febiconlogo.webp" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/Febiconlogo.webp" />
+    <link rel="icon" type="image/png" sizes="128x128" href="/Febiconlogo.webp" />
+
+    <!-- Google Site Verification -->
+    <meta name="google-site-verification" content="rM-x0Dtxaq4QbrVGnM_O5Qf6IdnyBtDIcbymVFDiZKk" />
+    
+    <style>
+      .initial-spiritual-loader {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at 50% 38%, #fff 0 18%, #fff9f0 38%, #f9edbf 100%);
+      }
+
+      .initial-spiritual-loader__orbit {
+        position: relative;
+        width: min(62vw, 280px);
+        aspect-ratio: 1;
+        border: 1px dashed rgba(139, 30, 30, 0.24);
+        border-radius: 50%;
+        animation: initial-spiritual-spin 5.5s linear infinite;
+      }
+
+      .initial-spiritual-loader__orbit span {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        display: grid;
+        width: 42px;
+        height: 42px;
+        place-items: center;
+        border: 1px solid rgba(212, 175, 55, 0.44);
+        border-radius: 50%;
+        background: rgba(255, 249, 240, 0.9);
+        color: #8b1e1e;
+        font-size: 20px;
+        box-shadow: 0 10px 28px rgba(139, 30, 30, 0.13);
+        transform: rotate(var(--angle)) translateX(min(31vw, 140px)) rotate(calc(var(--angle) * -1));
+      }
+
+      .initial-spiritual-loader__center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        display: grid;
+        width: clamp(96px, 22vw, 132px);
+        aspect-ratio: 1;
+        place-items: center;
+        border: 1px solid rgba(212, 175, 55, 0.46);
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 18px 50px rgba(74, 32, 11, 0.12);
+        transform: translate(-50%, -50%);
+      }
+
+      .initial-spiritual-loader__center img {
+        width: 72%;
+        height: 72%;
+        object-fit: contain;
+      }
+
+      @keyframes initial-spiritual-spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div class="initial-spiritual-loader" role="status" aria-label="Loading Puja Samagri">
+        <div class="initial-spiritual-loader__orbit" aria-hidden="true">
+          <span style="--angle: 0deg">ॐ</span>
+          <span style="--angle: 72deg">✦</span>
+          <span style="--angle: 144deg">◇</span>
+          <span style="--angle: 216deg">✺</span>
+          <span style="--angle: 288deg">✧</span>
+        </div>
+        <div class="initial-spiritual-loader__center" aria-hidden="true">
+          <img src="/Febiconlogo.webp" alt="Puja Samagri" />
+        </div>
+      </div>
+    </div>
+
+    <!-- React entry point -->
+    <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Razorpay Checkout -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js" async></script>
+  </body>
+</html>
