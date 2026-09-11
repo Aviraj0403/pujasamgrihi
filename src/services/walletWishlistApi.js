@@ -6,8 +6,8 @@ export const getMyWallet = async () => {
   return res.data;
 };
 
-export const addWalletFunds = async (amount, description, paymentId, source = 'RAZORPAY') => {
-  const res = await Axios.post('/wallet/add-funds', { amount, description, paymentId, source });
+export const addWalletFunds = async (amount, description, paymentId, source = 'RAZORPAY', razorpayOrderId = null, razorpayPaymentId = null) => {
+  const res = await Axios.post('/wallet/add-funds', { amount, description, paymentId, source, razorpayOrderId, razorpayPaymentId });
   return res.data;
 };
 

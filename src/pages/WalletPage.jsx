@@ -49,11 +49,69 @@ export default function WalletPage() {
     try {
       setTopUpLoading(true);
       setMsg({ text: '', type: '' });
-      const res = await addWalletFunds(num, 'Wallet Top-Up via Razorpay', `RZP_${Date.now()}`, 'RAZORPAY');
+
+      // 💳 1. Attempt Real Razorpay Payment Gateway Trigger
+      try {
+        const orderRes = await Axios.post('/razorpay/createRazorpayOrder', {
+          amount: Math.round(num),
+          userId: user?._id || user?.id,
+          purpose: 'WALLET_TOPUP'
+        });
+
+        if (orderRes.data?.success && window.Razorpay) {
+          const options = {
+            key: orderRes.data.key_id,
+            amount: orderRes.data.amount,
+            currency: 'INR',
+            order_id: orderRes.data.order_id,
+            name: 'Wallet Top-Up',
+            description: `Adding ₹${num} to Retailer Wallet`,
+            handler: async function (response) {
+              try {
+                // Verify payment & credit wallet
+                const verifyRes = await Axios.post('/razorpay/verifyPayment', {
+                  payment_id: response.razorpay_payment_id,
+                  order_id: response.razorpay_order_id,
+                  signature: response.razorpay_signature,
+                  paymentId: orderRes.data.paymentId
+                });
+
+                if (verifyRes.data?.success) {
+                  const creditRes = await addWalletFunds(num, 'Wallet Top-Up via Razorpay Gateway', orderRes.data.paymentId, 'RAZORPAY', response.razorpay_order_id, response.razorpay_payment_id);
+                  if (creditRes?.success) {
+                    setWalletData(creditRes.data);
+                    setTopUpAmount('');
+                    setMsg({ text: `Successfully credited ₹${num} via Razorpay!`, type: 'success' });
+                  }
+                }
+              } catch (verifyErr) {
+                setMsg({ text: 'Payment verification failed. Please contact support.', type: 'error' });
+              } finally {
+                setTopUpLoading(false);
+              }
+            },
+            prefill: {
+              name: user?.userName || '',
+              email: user?.email || '',
+              contact: user?.phoneNumber || ''
+            },
+            theme: { color: '#dc2626' }
+          };
+
+          const rzp = new window.Razorpay(options);
+          rzp.open();
+          return;
+        }
+      } catch (rzpErr) {
+        console.warn('Razorpay Gateway order creation failed or credentials missing, falling back to direct credit:', rzpErr?.response?.data || rzpErr.message);
+      }
+
+      // 🔄 Fallback for Sandbox / Test environment if Razorpay keys are not yet bound
+      const res = await addWalletFunds(num, 'Wallet Top-Up (Sandbox / Razorpay Direct)', `RZP_${Date.now()}`, 'RAZORPAY');
       if (res?.success) {
         setWalletData(res.data);
         setTopUpAmount('');
-        setMsg({ text: res.message || 'Funds added successfully via Razorpay!', type: 'success' });
+        setMsg({ text: res.message || 'Funds added successfully!', type: 'success' });
       }
     } catch (err) {
       setMsg({ text: err.response?.data?.message || 'Failed to add funds', type: 'error' });

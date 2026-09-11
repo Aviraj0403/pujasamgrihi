@@ -58,17 +58,21 @@ export const AuthProvider = ({ children }) => {
       const response = await Axios.post("/auth/phoneV1/login", {
         phoneNumber
       });
-      
-      // Fetch updated user data
-      const userRes = await Axios.get("/auth/me");
-      setUser(userRes.data.data);
-      
+
+      if (response.data?.userData) {
+        setUser(response.data.userData);
+      } else {
+        // Fetch updated user data
+        const userRes = await Axios.get("/auth/me");
+        setUser(userRes.data.data);
+      }
+
       // Sync cart
       setCartSyncing(true);
       await dispatch(syncCartOnLogin()).unwrap();
       await dispatch(fetchBackendCart()).unwrap();
       setCartSyncing(false);
-      
+
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: "Failed to login with phone" };
