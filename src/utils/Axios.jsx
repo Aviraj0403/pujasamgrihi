@@ -34,6 +34,11 @@ Axios.interceptors.request.use(
     if (TENANT_ID && TENANT_ID !== "YOUR_TENANT_PROJECT_ID") {
       config.headers['x-tenant-id'] = TENANT_ID;
     }
+    // Add token from localStorage to bypass cross-origin cookie drops (Exact Divyamantra Pattern)
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -50,6 +55,7 @@ Axios.interceptors.response.use(
     // Don't retry on these endpoints
     const skipRefreshRoutes = [
       '/auth/me',
+      '/auth/phoneV1/login',
       '/auth/phoneV2/send-otp',
       '/auth/phoneV2/verify-otp',
       '/auth/phoneV2/refresh-token',
