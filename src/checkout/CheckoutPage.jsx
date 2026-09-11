@@ -303,6 +303,11 @@ export default function CheckoutPage() {
         ...orderPayload,
         totalAmount: uiTotalPayable
       });
+    } else if (paymentMethod === "Wallet") {
+      initiateWalletPayment({
+        ...orderPayload,
+        totalAmount: uiTotalPayable
+      });
     } else if (paymentMethod === "COD") {
       initiateCOD({
         ...orderPayload,
@@ -310,6 +315,43 @@ export default function CheckoutPage() {
         paymentMethod: "COD"
       });
     } else {
+      setIsPlacingOrder(false);
+    }
+  };
+
+  const initiateWalletPayment = async (orderPayload) => {
+    try {
+      console.log("💳 Initiating Business Wallet order...");
+      
+      // Pay using Wallet API first
+      const walletRes = await axios.post("/wallet/pay", {
+        amount: orderPayload.totalAmount,
+        description: `Bulko Order Payment for ${cartItems.length} items`
+      }, { withCredentials: true });
+
+      if (!walletRes.data?.success) {
+        throw new Error(walletRes.data?.message || "Failed to process Wallet payment");
+      }
+
+      // Create Order
+      const { data } = await axios.post("/orders/createOrder", {
+        ...orderPayload,
+        paymentMethod: "WALLET",
+        paymentStatus: "PAID"
+      }, { withCredentials: true });
+
+      if (data.success) {
+        toast.success("Order placed successfully using Business Wallet!");
+        dispatch(clearCartThunk());
+        const orderId = data.order.id || data.order._id;
+        navigate(`/invoice/${orderId}`, { state: { order: data.order } });
+      } else {
+        throw new Error(data.message || "Failed to create order");
+      }
+    } catch (err) {
+      console.error("❌ Wallet order error:", err);
+      toast.error(err.response?.data?.message || err.message || "Failed to pay via Wallet. Please check balance.");
+    } finally {
       setIsPlacingOrder(false);
     }
   };
@@ -678,6 +720,27 @@ export default function CheckoutPage() {
                 </div>
               </label>
 
+              {/* Wallet Option */}
+              <label 
+                className={`flex-1 border-2 rounded-xl p-4 cursor-pointer transition flex items-center gap-3 ${
+                  paymentMethod === "Wallet" ? "border-emerald-600 bg-emerald-50" : "border-gray-200"
+                }`}
+              >
+                <input 
+                  type="radio" 
+                  name="payment_method" 
+                  checked={paymentMethod === "Wallet"}
+                  onChange={() => setPaymentMethod("Wallet")}
+                  className="text-emerald-600"
+                />
+                <div>
+                  <p className="font-semibold text-brand-text flex items-center gap-1.5">
+                    💳 Retailer Wallet
+                  </p>
+                  <p className="text-xs text-gray-500">Instant 1-Click Pay from your Bulko balance</p>
+                </div>
+              </label>
+
               {/* Cash on Delivery Option - CAN BE COMMENTED OUT IF NEEDED */}
               {isCODEnabled && (
                 <label 
@@ -706,7 +769,7 @@ export default function CheckoutPage() {
                 disabled={isPlacingOrder || !shippingInfo.isServiceable || shippingInfo.isValidating}
                 className="w-full sm:w-auto bg-primary-500 text-white font-bold px-10 py-4 rounded-xl hover:bg-primary-600 disabled:opacity-60 disabled:cursor-not-allowed transition shadow-lg"
               >
-                {isPlacingOrder ? "Processing..." : paymentMethod === "Razorpay" ? "Complete Payment" : "Place Order (COD)"}
+                {isPlacingOrder ? "Processing..." : paymentMethod === "Razorpay" ? "Complete Payment" : paymentMethod === "Wallet" ? "Pay with Business Wallet" : "Place Order (COD)"}
               </button>
             </div>
           </div>

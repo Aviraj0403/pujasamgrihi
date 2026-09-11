@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Smartphone, Info, Truck, ShoppingCart, User, LogOut, ChevronDown } from "lucide-react";
+import { Smartphone, Info, Truck, ShoppingCart, User, LogOut, ChevronDown, Heart, Wallet } from "lucide-react";
 import { FaPhone, FaMapMarkerAlt } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
 import { getMenuCategories } from "../../services/categoryApi";
@@ -122,6 +122,14 @@ export default function DesktopHeader() {
 
         {/* Right Side */}
         <div className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center gap-6 text-white font-medium">
+          <Link to="/wishlist" className="flex items-center gap-1.5 text-sm font-semibold hover:text-red-200 transition">
+            <Heart size={16} className="text-red-200 fill-red-200" /> WISHLIST
+          </Link>
+
+          <Link to="/wallet" className="flex items-center gap-1.5 text-sm font-semibold hover:text-emerald-200 transition bg-white/10 px-2.5 py-1 rounded-lg border border-white/20">
+            <Wallet size={16} className="text-emerald-300" /> WALLET
+          </Link>
+
           <Link to="/contact-us" className="flex items-center gap-1 hover:text-gray-200 transition">
             <Info size={15} /> SUPPORT
           </Link>

@@ -30,6 +30,9 @@ import MobileSearchPage from "./components/Header/MobileSearchPage.jsx";
 // import Signup from "./authentication/Signup.jsx";
 import RequireAuth from "./components/RequireAuth.jsx";
 
+import WishlistPage from "./pages/WishlistPage.jsx";
+import WalletPage from "./pages/WalletPage.jsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -43,6 +46,8 @@ const router = createBrowserRouter([
       { path: "/signin", element: <SignInPage /> },
       { path: "/signup", element: <SignupPage /> },
       { path: "/profile", element: <ProfilePage /> },
+      { path: "/wallet", element: <WalletPage /> },
+      { path: "/wishlist", element: <WishlistPage /> },
       { path: "/order/:orderId", element: <OrderDetails /> },
       { path: "/track-order", element: <TrackOrder /> },
       { path: "/tracking-demo", element: <OrderTrackingDemo /> },

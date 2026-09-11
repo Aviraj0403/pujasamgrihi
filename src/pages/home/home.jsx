@@ -10,12 +10,15 @@ import BeautyHighlightSection from "./BeautyHighlightSection";
 import FloatingNewArrival from "./FloatingNewArrival";
 import WhyChooseUs from "./WhyChooseUs";
 
+import BulkoRetailerBanner from "../../components/BulkoRetailerBanner";
+
 function Home() {
   return (
     <div className="bg-brand-bg min-h-screen">
       <FloatingNewArrival />
       <MobileCategorySection />
       <BannerSlider />
+      <BulkoRetailerBanner />
       <CategorySlider />
       <ComboSection />
       <BestsellerSection />
