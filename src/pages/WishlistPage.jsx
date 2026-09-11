@@ -4,7 +4,7 @@ import { getWishlist, toggleWishlist } from '../services/walletWishlistApi';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { addToCart } from '../store/cartSlice';
+import { addToCartThunk } from '../features/cart/cartThunk';
 
 export default function WishlistPage() {
   const { user } = useAuth();
@@ -47,7 +47,13 @@ export default function WishlistPage() {
   };
 
   const handleAddToCart = (product) => {
-    dispatch(addToCart({ product, quantity: product.minOrderQty || 1 }));
+    dispatch(addToCartThunk({
+      productId: product._id,
+      size: 'Standard',
+      color: 'Standard',
+      quantity: product.minOrderQty || 1,
+      product
+    }));
   };
 
   if (loading) {

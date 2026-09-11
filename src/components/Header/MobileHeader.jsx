@@ -12,6 +12,8 @@ import {
   ChevronDown,
   ChevronUp,
   LogOut,
+  Wallet,
+  Heart,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -98,6 +100,15 @@ const location = useLocation();
 
           {/* Profile + Cart */}
           <div className="flex items-center gap-4 text-brand-text">
+            {/* Wallet Quick Button */}
+            <Link
+              to="/wallet"
+              className="relative flex flex-col items-center text-xs text-emerald-600 font-semibold hover:text-emerald-700 transition bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-200"
+            >
+              <Wallet size={18} />
+              <span>Wallet</span>
+            </Link>
+
             {/* Profile */}
             <button
               onClick={handleProfileClick}
@@ -182,6 +193,15 @@ const location = useLocation();
           <span className="text-xs">Offers</span>
         </Link> */}
 
+        <Link
+          to="/wallet"
+          onClick={() => setActiveTab("wallet")}
+          className={`flex flex-col items-center ${activeTab === "wallet" ? "text-emerald-600 font-bold" : "text-brand-text"}`}
+        >
+          <Wallet size={22} />
+          <span className="text-xs">Wallet</span>
+        </Link>
+
         <button
           onClick={() => {
             setActiveTab("account");
@@ -219,6 +239,24 @@ const location = useLocation();
               <User size={22} />
               <span>My Profile</span>
             </button>
+
+            <Link
+              to="/wallet"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center gap-3 text-emerald-700 font-semibold hover:text-emerald-800 transition bg-emerald-50 p-2 rounded-lg"
+            >
+              <Wallet size={22} />
+              <span>My Wallet & E-Ledger</span>
+            </Link>
+
+            <Link
+              to="/wishlist"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center gap-3 text-brand-text hover:text-primary-600 transition"
+            >
+              <Heart size={22} />
+              <span>My Wishlist</span>
+            </Link>
 
             <Link
               to="/cart"
