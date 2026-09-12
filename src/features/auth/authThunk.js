@@ -10,6 +10,7 @@ import {
   getProfile,
 } from '../../services/authApi'; // tumhara Axios file
 
+import { storeToken, clearStoredToken } from '../../utils/Axios';
 import { setUser, clearUser, setAuthChecked } from './authSlice';
 import { loadCartFromBackend, syncCartOnLogin } from '../cart/cartThunks';
 import { clearCart } from '../cart/cartSlice';
@@ -36,7 +37,11 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials, { dispatch, rejectWithValue }) => {
     try {
-      await login(credentials); // backend login
+      const loginRes = await login(credentials); // backend login
+      // 🔑 Store token as fallback for browsers that block cross-subdomain cookies (Edge ITP, Safari)
+      const token = loginRes?.data?.token;
+      if (token) storeToken(token);
+
       const res = await authMe();
       dispatch(setUser(res.data));
       await dispatch(syncCartOnLogin()).unwrap(); // guest cart → user cart merge
@@ -89,6 +94,7 @@ export const logoutUser = createAsyncThunk(
   async (_, { dispatch, rejectWithValue }) => {
     try {
       await logout();
+      clearStoredToken(); // 🗑️ Clear fallback token from sessionStorage
       dispatch(clearUser());
       dispatch(clearCart()); // local + backend clear
       return true;

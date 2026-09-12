@@ -59,11 +59,6 @@ export const AuthProvider = ({ children }) => {
         phoneNumber
       });
 
-      // 🔐 Save token to localStorage to fix cross-origin session loss (Exact Divyamantra Pattern)
-      if (response.data?.token) {
-        localStorage.setItem("token", response.data.token);
-      }
-
       if (response.data?.userData) {
         setUser(response.data.userData);
       } else {
@@ -91,11 +86,6 @@ export const AuthProvider = ({ children }) => {
         sessionId,
         otp
       });
-      
-      // Save token to localStorage to fix cross-origin session loss
-      if (response.data?.token) {
-        localStorage.setItem("token", response.data.token);
-      }
       
       // Fetch updated user data
       const userRes = await Axios.get("/auth/me");

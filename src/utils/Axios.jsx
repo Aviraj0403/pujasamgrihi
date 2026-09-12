@@ -10,7 +10,7 @@ const Axios = axios.create({
 });
 
 // ✅ Here you specify the exact tenant ID so the master backend knows whose data to show
-const TENANT_ID = "00001"; // <--- Demo will now pull data for project 00001 (test.aviraj.com)
+const TENANT_ID = "00001"; // <--- Demo will now pull data for project 00001
 
 // Track if we're currently refreshing to prevent multiple refresh calls
 let isRefreshing = false;
@@ -27,6 +27,15 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
+// 🔑 Token storage helpers — fallback when cross-subdomain cookies are blocked by browser
+// (Edge Tracking Prevention / Safari ITP blocks cross-site cookies)
+const TOKEN_KEY = 'auth_token';
+export const storeToken = (token) => {
+  if (token) sessionStorage.setItem(TOKEN_KEY, token);
+};
+export const getStoredToken = () => sessionStorage.getItem(TOKEN_KEY);
+export const clearStoredToken = () => sessionStorage.removeItem(TOKEN_KEY);
+
 // Request interceptor
 Axios.interceptors.request.use(
   (config) => {
@@ -34,11 +43,15 @@ Axios.interceptors.request.use(
     if (TENANT_ID && TENANT_ID !== "YOUR_TENANT_PROJECT_ID") {
       config.headers['x-tenant-id'] = TENANT_ID;
     }
-    // Add token from localStorage to bypass cross-origin cookie drops (Exact Divyamantra Pattern)
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+
+    // 🛡️ Fallback: If cookie is blocked by browser tracking prevention,
+    // inject the token from sessionStorage as Authorization: Bearer header.
+    // This handles Edge Tracking Prevention / Safari ITP blocking cross-subdomain cookies.
+    const storedToken = getStoredToken();
+    if (storedToken && !config.headers['Authorization']) {
+      config.headers['Authorization'] = `Bearer ${storedToken}`;
     }
+
     return config;
   },
   (error) => {
@@ -52,21 +65,22 @@ Axios.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Don't retry on these endpoints
+    // Don't retry on these endpoints to avoid infinite loops
     const skipRefreshRoutes = [
-      '/auth/me',
       '/auth/phoneV1/login',
       '/auth/phoneV2/send-otp',
       '/auth/phoneV2/verify-otp',
       '/auth/phoneV2/refresh-token',
-      '/auth/user/logout'
+      '/auth/refresh-token',
+      '/auth/user/logout',
+      '/auth/signIn',
     ];
 
-    const shouldSkipRefresh = skipRefreshRoutes.some(route => 
+    const shouldSkipRefresh = skipRefreshRoutes.some(route =>
       originalRequest.url?.includes(route)
     );
 
-    // Handle 401 errors
+    // Handle 401 errors — try token refresh
     if (error.response?.status === 401 && !originalRequest._retry && !shouldSkipRefresh) {
       
       if (isRefreshing) {
@@ -82,8 +96,9 @@ Axios.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        // ✅ Use correct refresh endpoint (not phoneV2)
         await axios.post(
-          `${baseURL}/auth/phoneV2/refresh-token`,
+          `${baseURL}/auth/refresh-token`,
           {},
           { withCredentials: true }
         );
@@ -96,10 +111,8 @@ Axios.interceptors.response.use(
         processQueue(refreshError, null);
         isRefreshing = false;
 
-        // Clear local data and redirect to login
-        console.error("❌ Refresh token failed. Redirecting to login.");
-        
         // Clear all auth-related storage
+        clearStoredToken();
         localStorage.removeItem("user");
         sessionStorage.clear();
         
